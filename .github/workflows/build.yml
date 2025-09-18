@@ -1,0 +1,68 @@
+name: Build Project
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential make libssl-dev pkg-config
+
+      - name: Build project
+        run: make
+
+      - name: Upload Linux executable
+        if: github.repository != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanner-linux
+          path: build/scanner
+
+  build-windows:
+    name: Build Windows (MinGW + OpenSSL)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-pkg-config
+
+      - name: Add MSYS2 to PATH
+        run: echo "C:\\msys64\\mingw64\\bin" >> $env:GITHUB_PATH
+        shell: powershell
+
+      - name: Debug OpenSSL pkg-config
+        run: |
+          pkg-config --cflags openssl
+          pkg-config --libs openssl
+        shell: msys2 {0}
+
+      - name: Build project
+        run: mingw32-make -f Makefile
+        shell: msys2 {0}
+
+      - name: Upload Windows executable
+        if: github.repository != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanner-windows
+          path: build/scanner.exe
