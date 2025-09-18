@@ -91,11 +91,11 @@ std::string Scanner::ComputeSha256(const std::filesystem::path& p_filePath) {
     SHA256_CTX l_ctx;
     SHA256_Init(&l_ctx);
 
-    char l_buffer[8192];
-    while (l_file.read(l_buffer, sizeof(l_buffer))) {
-        SHA256_Update(&l_ctx, l_buffer, l_file.gcount());
+    const size_t l_bufferSize = 1 << 16; // 64KB
+    std::vector<char> l_buffer(l_bufferSize);
+    while (l_file.read(l_buffer.data(), l_buffer.size()) || l_file.gcount()) {
+        SHA256_Update(&l_ctx, l_buffer.data(), l_file.gcount());
     }
-    SHA256_Update(&l_ctx, l_buffer, l_file.gcount());
 
     unsigned char l_hash[SHA256_DIGEST_LENGTH];
     SHA256_Final(l_hash, &l_ctx);
