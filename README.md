@@ -14,9 +14,8 @@ HashScanner is a cross-platform (Windows & Linux) C++ application for scanning d
 
 ## Dependencies
 
-- C++17 or newer  
+- C++20 or newer  
 - [OpenSSL](https://www.openssl.org/) (`libssl-dev` on Linux, `vcpkg install openssl` on Windows)  
-- A C++17-compatible compiler (g++, clang++, MSVC)  
 - [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) (recommended for Linux builds)  
 
 ## Configuration
