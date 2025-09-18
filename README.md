@@ -72,4 +72,4 @@ The IOC file (hashes.csv) should contain one SHA-256 hash per line:
 
 ## License
 
-MIT License
+Apache-2.0 license
