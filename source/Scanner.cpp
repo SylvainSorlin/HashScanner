@@ -2,8 +2,6 @@
 #include <openssl/sha.h>
 #include <cstring>
 
-namespace fs = std::filesystem;
-
 Scanner::Scanner(const Config& p_Config)
     : m_config(p_Config)
 {
@@ -15,7 +13,7 @@ void Scanner::Run() {
     std::ofstream(m_config.Output_file(), std::ios::trunc).close();
     std::ofstream(m_config.Error_file(), std::ios::trunc).close();
 
-    if (!fs::exists(m_config.Ioc_file())) {
+    if (!std::filesystem::exists(m_config.Ioc_file())) {
         m_config.LogError("Error: cannot find IOC file: " + m_config.Ioc_file().string());
         exit(1);
     }
@@ -48,17 +46,17 @@ void Scanner::LoadIocHashes() {
 
 void Scanner::CollectFiles(const std::filesystem::path &p_directory) {
     std::error_code l_ec;
-    fs::path l_dirPath(p_directory);
+    std::filesystem::path l_dirPath(p_directory);
 
-    if (!fs::exists(l_dirPath, l_ec) || !fs::is_directory(l_dirPath, l_ec)) {
+    if (!std::filesystem::exists(l_dirPath, l_ec) || !std::filesystem::is_directory(l_dirPath, l_ec)) {
         return;
     }
 
-    for (const auto& l_entry : fs::directory_iterator(l_dirPath, fs::directory_options::skip_permission_denied, l_ec)) {
+    for (const auto& l_entry : std::filesystem::directory_iterator(l_dirPath, std::filesystem::directory_options::skip_permission_denied, l_ec)) {
         std::filesystem::path l_entryPath = l_entry.path();
 
         // Skip symlinks
-        if (fs::is_symlink(l_entry.path(), l_ec)) {
+        if (std::filesystem::is_symlink(l_entry.path(), l_ec)) {
             continue;
         }
 
@@ -68,7 +66,7 @@ void Scanner::CollectFiles(const std::filesystem::path &p_directory) {
         }
 
         if (l_entry.is_regular_file(l_ec)) {
-            if (fs::file_size(l_entry.path(), l_ec) > 0) {
+            if (std::filesystem::file_size(l_entry.path(), l_ec) > 0) {
                 m_filesToScan.push_back(l_entryPath);
             }
         } else if (l_entry.is_directory(l_ec)) {
@@ -148,7 +146,7 @@ void Scanner::ScanFiles() {
     std::cout << "\nAnalysis done. Please refer to "
               << m_config.Output_file() << " and " << m_config.Error_file() << " for more details.\n";
 
-    if (fs::file_size(m_config.Output_file()) > 0) {
+    if (std::filesystem::file_size(m_config.Output_file()) > 0) {
         std::cout << "❌ IOCs have been found on this target ❌ -> See " << m_config.Output_file() << "\n";
     } else {
         std::cout << "✅ No IOC hash found ✅\n";
