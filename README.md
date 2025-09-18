@@ -1,24 +1,42 @@
-# HashScanner
+# 🔍 HashScanner
 
-HashScanner is a cross-platform (Windows & Linux) C++ application for scanning directories, computing SHA256 hashes of files, and checking them against a list of Indicators of Compromise (IOCs). It supports configuration via a simple `config.ini` file.
+A multithreaded C++ utility to scan files and compute their SHA-256 hash, then compare them against a list of IOC (Indicators of Compromise).
+
+Perfect for detecting suspicious or compromised files on Linux and Windows systems.
 
 ## Features
 
-- Recursively scans directories for files  
-- Skips empty files, symlinks, and pruned paths  
-- Computes SHA256 hashes using OpenSSL  
-- Compares file hashes against a CSV list of IOCs  
-- Logs results and errors to configurable files  
-- Multi-threaded scanning for performance  
-- Configurable via `config.ini` or command-line argument  
+- ⚡ Fast scanning with multithreading
+- 📂 Cross-platform: Linux & Windows
+- 🛡 Verify files using SHA-256 (OpenSSL)
+- ⚙️ Flexible configuration:
+    - config.ini file
+- 📝 Log results and errors to files
+- 🚫 Exclude specific directories using PrunePaths
 
-## Dependencies
+## 📦 Installation
+### Dependencies
 
 - C++20 or newer  
-- [OpenSSL](https://www.openssl.org/) (`libssl-dev` on Linux, `vcpkg install openssl` on Windows)  
-- [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) (recommended for Linux builds)  
+- [OpenSSL](https://www.openssl.org/) (`libssl-dev` on Linux, `mingw-w64-x86_64-openssl` on Windows)
+- [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/)
 
-## Configuration
+### Build on Linux
+
+```sh
+sudo apt install build-essential libssl-dev pkg-config
+make
+```
+
+### Build on Windows (MSYS2/MinGW)
+
+```sh
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl pkg-config
+mingw32-make
+```
+
+
+## ⚙️ Configuration
 
 Create a `config.ini` file in the project root:
 
@@ -27,7 +45,7 @@ scan_dir=C:\Path\To\Scan
 output_file=output.log
 error_file=error.log
 ioc_file=C:\Path\To\IOC_hash.csv
-prune_paths=SharePoint;Temp;Windows
+prune_paths=C:\Windows
 ```
 
 - `scan_dir`: Directory to scan  
@@ -36,49 +54,22 @@ prune_paths=SharePoint;Temp;Windows
 - `ioc_file`: CSV file containing IOC hashes (**ONLY SHA256**)
 - `prune_paths`: Semicolon-separated list of folder names to skip  
 
-## Build
 
-### Linux
 
-```sh
-sudo apt install build-essential libssl-dev pkg-config
-make
+## 📄 IOC File (CSV)
+The IOC file (hashes.csv) should contain one SHA-256 hash per line:
 ```
-
-### Windows (MSYS2/MinGW)
-
-```sh
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl pkg-config
-mingw32-make
+9a0364b9e99bb480dd25e1f0284c8555...
+2c26b46b68ffc68ff99b453c1d304134...
 ```
+- Each hash must be 64 hexadecimal characters
+- Case-insensitive
 
-## Run
+## 🛠 Planned Improvements
 
-By default, the program looks for config.ini in the current directory:
-```sh
-./HashScanner
-```
-
-You can also provide a custom configuration file as an argument:
-```sh
-./HashScanner custom_config.ini
-```
-
-On Windows (PowerShell or CMD):
-```sh
-HashScanner.exe
-HashScanner.exe custom_config.ini
-```
-
-## Output
-
-- Results are written to the file specified by `output_file`
-- Errors are written to the file specified by `error_file`
+- Support for additional hash algorithms (SHA-1, SHA-512, MD5)
+- Add multithreading to the file collection process to improve scan performance
 
 ## License
 
 MIT License
-
-## Author
-
-SylvainSorlin
