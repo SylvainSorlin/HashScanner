@@ -21,7 +21,7 @@ Config::Config(const std::filesystem::path& p_filename) {
 
 void Config::ParsePrunePaths(const std::string& p_pruneStr) {
     m_prunePaths.clear();
-    std::stringstream ss(pruneStr);
+    std::stringstream ss(p_pruneStr);
     std::string item;
     while (std::getline(ss, item, ';')) {
         if (!item.empty()) {
@@ -39,15 +39,15 @@ std::string Config::Trim(const std::string& s) {
 }
 
 std::string Config::GetIniValue(std::ifstream& p_ini, const std::string& p_key) {
-    ini.clear();
-    ini.seekg(0);
+    p_ini.clear();
+    p_ini.seekg(0);
     std::string line;
-    while (std::getline(ini, line)) {
+    while (std::getline(p_ini, line)) {
         size_t eq = line.find('=');
         if (eq != std::string::npos) {
             std::string k = Trim(line.substr(0, eq));
             std::string v = Trim(line.substr(eq + 1));
-            if (k == key) return v;
+            if (k == p_key) return v;
         }
     }
     return "";
