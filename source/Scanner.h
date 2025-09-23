@@ -31,14 +31,15 @@ private:
     std::vector<std::filesystem::path> m_foldersFound;
 
     void LoadIocHashes();
-    void CollectFiles(const std::filesystem::path &directory);
-    std::string ComputeSha256(const std::filesystem::path& filePath);
+    void CollectFiles(const std::filesystem::path &p_directory);
+    std::string ComputeSha256(const std::filesystem::path& p_filePath);
+    bool CheckExtension(const std::filesystem::path& p_filePath);
 
-    bool IsPrunedPath(const std::filesystem::path& path);
+    bool IsPrunedPath(const std::filesystem::path& p_path);
 
     void ScanFiles();
     void WorkerThread(size_t total);
-    void ScanFileTask(const std::filesystem::path& file, size_t total);
+    void ScanFileTask(const std::filesystem::path& p_file, size_t p_total);
 
     // PROGRESS BAR
     std::mutex m_outputMutex;
@@ -46,7 +47,7 @@ private:
     std::mutex m_progressMutex;
     size_t m_progressCount = 0;
 
-    void PrintProgress(size_t current, size_t total);
+    void PrintProgress(size_t p_current, size_t p_total);
 
     /// THREAD
     std::mutex m_queueMutex;
