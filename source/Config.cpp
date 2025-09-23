@@ -13,12 +13,13 @@ Config::Config(const std::filesystem::path& p_filename) {
     m_errorFile  = GetIniValue(ini, "error_file");
     m_iocFile    = GetIniValue(ini, "ioc_file");
     ParsePrunePaths(GetIniValue(ini, "prune_paths"));
+    std::istringstream(GetIniValue(ini, "debug")) >> m_debug;
 
     Validate();
     PrintInfo();
 }
 
-void Config::ParsePrunePaths(const std::string& pruneStr) {
+void Config::ParsePrunePaths(const std::string& p_pruneStr) {
     m_prunePaths.clear();
     std::stringstream ss(pruneStr);
     std::string item;
@@ -37,7 +38,7 @@ std::string Config::Trim(const std::string& s) {
     return s.substr(start, end - start + 1);
 }
 
-std::string Config::GetIniValue(std::ifstream& ini, const std::string& key) {
+std::string Config::GetIniValue(std::ifstream& p_ini, const std::string& p_key) {
     ini.clear();
     ini.seekg(0);
     std::string line;
@@ -58,6 +59,7 @@ void Config::PrintInfo() const {
     std::cout << "  outputFile : " << m_outputFile.string() << std::endl;
     std::cout << "  errorFile  : " << m_errorFile.string() << std::endl;
     std::cout << "  iocFile    : " << m_iocFile.string() << std::endl;
+    std::cout << "  debug      : " << m_debug << std::endl;
 
     std::cout << "  prunePaths :" << std::endl;
     if (m_prunePaths.empty()) {
@@ -89,5 +91,8 @@ void Config::LogOutput(const std::string& p_message) {
 void Config::LogError(const std::string& p_message) {
     std::ofstream err(m_errorFile, std::ios::app);
     err << p_message << std::endl;
-    std::cerr << p_message << std::endl;
+    if(m_debug)
+    {
+        std::cerr << p_message << std::endl;
+    }
 }

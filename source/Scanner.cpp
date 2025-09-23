@@ -105,6 +105,10 @@ std::string Scanner::ComputeSha256(const std::filesystem::path& p_filePath) {
     return l_oss.str();
 }
 
+bool Scanner::CheckExtension(const std::filesystem::path& p_filePath) {
+    return (p_filePath.extension() == ".rggJ3pSi_l"); //Qilin extension
+}
+
 void Scanner::ScanFiles() {
     size_t l_total = m_filesToScan.size();
     if (l_total == 0) {
@@ -180,8 +184,13 @@ void Scanner::ScanFileTask(const std::filesystem::path& p_file, size_t p_total) 
     try {
         std::string l_hash = ComputeSha256(p_file);
         if (!l_hash.empty() && m_iocHashes.find(l_hash) != m_iocHashes.end()) {
-            std::lock_guard<std::mutex> lock(m_errorMutex);
+            std::lock_guard<std::mutex> lock(m_outputMutex);
             m_config.LogOutput("Correspondence found: " + p_file.string() + " (hash: " + l_hash + ")");
+        }
+        if (CheckExtension(p_file))
+        {
+            std::lock_guard<std::mutex> lock(m_outputMutex);
+            m_config.LogOutput("Extension found: " + p_file.string());
         }
     } catch (const std::exception& e) {
         std::lock_guard<std::mutex> lock(m_errorMutex);
