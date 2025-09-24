@@ -3,7 +3,7 @@
 #include <cstring>
 
 Scanner::Scanner(const Config& p_Config)
-    : m_config(p_Config)
+    : m_config(p_Config), m_yaraScanner(p_Config)
 {
 
 }
@@ -20,6 +20,13 @@ void Scanner::Run() {
 
     std::cout<< "Info: Loading Hashes" <<std::endl;
     LoadIocHashes();
+
+    std::cout<< "Info: Loading Yara rules" <<std::endl;
+    if (!m_yaraScanner.Initialize(m_config.Yara_file())) {
+        m_config.LogError("Failed to initialize YARA scanner.");
+        std::cout<< "WARNING: No YARA scanner." <<std::endl;
+    }
+
     std::cout<< "Info: Collecting Files List..." <<std::endl;
     if (m_config.Scan_dir() == "*") {
 #ifdef _WIN32
@@ -226,6 +233,17 @@ void Scanner::ScanFileTask(const std::filesystem::path& p_file, size_t p_total) 
             std::lock_guard<std::mutex> lock(m_outputMutex);
             m_config.LogOutput("Extension found: " + p_file.string());
         }
+        std::vector<std::string> l_matchedRules;
+        if (CheckYara(p_file, l_matchedRules))
+        {
+            std::lock_guard<std::mutex> lock(m_outputMutex);
+            std::string l_StringmatchedRules;
+            for (const auto& rule : l_matchedRules) {
+                l_StringmatchedRules+=rule+";";
+            }
+            l_StringmatchedRules.pop_back();
+            m_config.LogOutput("[YARA] YARA rules matched: " + p_file.string() + " | " + l_StringmatchedRules);
+        }
     } catch (const std::exception& e) {
         std::lock_guard<std::mutex> lock(m_errorMutex);
         m_config.LogError("Error reading file: " + p_file.string() + " (" + e.what() + ")");
@@ -237,6 +255,10 @@ void Scanner::ScanFileTask(const std::filesystem::path& p_file, size_t p_total) 
         PrintProgress(m_progressCount, p_total);
     }
 }
+
+ bool Scanner::CheckYara(const std::filesystem::path& p_filePath, std::vector<std::string>& p_matchedRules) {
+    return m_yaraScanner.ScanFile(p_filePath, p_matchedRules);
+ }
 
 void Scanner::PrintProgress(size_t p_current, size_t p_total) {
     const int l_barSize = 50;

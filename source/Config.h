@@ -18,6 +18,7 @@ public:
     const std::filesystem::path& Error_file() const { return m_errorFile; }
     const std::filesystem::path& Scan_dir() const { return m_scanDir; }
     const std::filesystem::path& Ioc_file() const { return m_iocFile; }
+    const std::filesystem::path& Yara_file() const { return m_yaraFile; }
     const std::vector<std::filesystem::path>& Prune_paths() const { return m_prunePaths; }
     bool Debug() const { return m_debug; }
 
@@ -30,6 +31,7 @@ private:
     std::filesystem::path m_outputFile;
     std::filesystem::path m_errorFile;
     std::filesystem::path m_iocFile;
+    std::filesystem::path m_yaraFile;
     std::vector<std::filesystem::path> m_prunePaths;
 
     bool m_debug;

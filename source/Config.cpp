@@ -12,6 +12,7 @@ Config::Config(const std::filesystem::path& p_filename) {
     m_outputFile = GetIniValue(ini, "output_file");
     m_errorFile  = GetIniValue(ini, "error_file");
     m_iocFile    = GetIniValue(ini, "ioc_file");
+    m_yaraFile   = GetIniValue(ini, "yara_file");
     ParsePrunePaths(GetIniValue(ini, "prune_paths"));
     std::istringstream(GetIniValue(ini, "debug")) >> m_debug;
 
@@ -59,6 +60,7 @@ void Config::PrintInfo() const {
     std::cout << "  outputFile : " << m_outputFile.string() << std::endl;
     std::cout << "  errorFile  : " << m_errorFile.string() << std::endl;
     std::cout << "  iocFile    : " << m_iocFile.string() << std::endl;
+    std::cout << "  yaraFile   : " << m_yaraFile.string() << std::endl;
     std::cout << "  debug      : " << m_debug << std::endl;
 
     std::cout << "  prunePaths :" << std::endl;
@@ -77,6 +79,7 @@ void Config::Validate() {
     if (m_outputFile.empty()) { LogError("Missing config value: output_file"); missing = true; }
     if (m_errorFile.empty())  { LogError("Missing config value: error_file");  missing = true; }
     if (m_iocFile.empty())    { LogError("Missing config value: ioc_file");    missing = true; }
+    if (m_yaraFile.empty())   { LogError("Warning: config value: yara_file");    missing = true; }
     if (m_prunePaths.empty()) { LogError("Warning: prune_paths not set."); }
 
     if (missing) throw std::runtime_error("Please check your config file.");

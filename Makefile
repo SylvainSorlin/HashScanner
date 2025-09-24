@@ -28,10 +28,10 @@ TARGET    := $(BUILD_DIR)/scanner$(EXEEXT)
 
 # Flags
 CXXFLAGS ?= -g -std=c++17 -Wall -Wextra -MMD -MP
-CXXFLAGS += $(shell pkg-config --cflags openssl)
+CXXFLAGS += $(shell pkg-config --cflags yara openssl)
 
-LDFLAGS  ?= -static
-LDFLAGS  += $(shell pkg-config --libs openssl)
+LDFLAGS ?= -static
+LDFLAGS += $(shell pkg-config --libs --static yara openssl) -llzma -lbz2
 
 # ================================
 # Rules

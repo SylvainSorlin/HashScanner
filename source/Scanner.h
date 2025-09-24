@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Config.h"
+#include "YaraScanner.h"
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -26,6 +27,7 @@ public:
 
 private:
     Config m_config;
+    YaraScanner m_yaraScanner;
     std::unordered_set<std::string> m_iocHashes;
     std::vector<std::filesystem::path> m_filesToScan;
     std::vector<std::filesystem::path> m_foldersFound;
@@ -34,6 +36,7 @@ private:
     void CollectFiles(const std::filesystem::path &p_directory);
     std::string ComputeSha256(const std::filesystem::path& p_filePath);
     bool CheckExtension(const std::filesystem::path& p_filePath);
+    bool CheckYara(const std::filesystem::path& p_filePath, std::vector<std::string>& p_matchedRules);
 
     bool IsPrunedPath(const std::filesystem::path& p_path);
 
