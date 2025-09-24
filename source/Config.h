@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
 class Config {
 public:
@@ -16,7 +19,7 @@ public:
     const std::filesystem::path& Scan_dir() const { return m_scanDir; }
     const std::filesystem::path& Ioc_file() const { return m_iocFile; }
     const std::vector<std::filesystem::path>& Prune_paths() const { return m_prunePaths; }
-    const bool Debug() const { return m_debug; }
+    bool Debug() const { return m_debug; }
 
     //LOG
     void LogOutput(const std::string& p_message);
@@ -36,4 +39,5 @@ private:
     void Validate();
     void PrintInfo() const;
     void ParsePrunePaths(const std::string& p_pruneStr);
+    std::string CurrentDateTime();
 };

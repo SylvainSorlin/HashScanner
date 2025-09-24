@@ -21,7 +21,41 @@ void Scanner::Run() {
     std::cout<< "Info: Loading Hashes" <<std::endl;
     LoadIocHashes();
     std::cout<< "Info: Collecting Files List..." <<std::endl;
-    CollectFiles(m_config.Scan_dir());
+    if (m_config.Scan_dir() == "*") {
+#ifdef _WIN32
+        // --- Windows
+        DWORD drives = GetLogicalDrives();
+        for (char letter = 'A'; letter <= 'Z'; ++letter) {
+            if (drives & (1 << (letter - 'A'))) {
+                std::string rootPath = std::string(1, letter) + ":\\";
+                CollectFiles(rootPath);
+            }
+        }
+    #else
+        // --- Linux/Unix
+       std::ifstream mounts("/proc/mounts");
+        std::set<std::string> done;
+        std::string line;
+
+        while (std::getline(mounts, line)) {
+            std::istringstream iss(line);
+            std::string device, mountpoint, fstype, options;
+            if (!(iss >> device >> mountpoint >> fstype >> options)) continue;
+
+            if (fstype == "proc" || fstype == "sysfs" || fstype == "tmpfs" ||
+                fstype == "devtmpfs" || fstype == "devpts" || fstype == "cgroup" ||
+                fstype == "overlay")
+                continue;
+
+            // Skip duplicates
+            if (!done.insert(mountpoint).second) continue;
+
+            CollectFiles(mountpoint);
+        }
+#endif
+    } else {
+        CollectFiles(m_config.Scan_dir());
+    }
     ScanFiles();
 }
 

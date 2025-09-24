@@ -85,14 +85,30 @@ void Config::Validate() {
 // LOG
 void Config::LogOutput(const std::string& p_message) {
     std::ofstream out(m_outputFile, std::ios::app);
-    out << p_message << std::endl;
+    out << CurrentDateTime() << " " << p_message << std::endl;
 }
 
 void Config::LogError(const std::string& p_message) {
     std::ofstream err(m_errorFile, std::ios::app);
-    err << p_message << std::endl;
+    err << CurrentDateTime() << " " << p_message << std::endl;
     if(m_debug)
     {
-        std::cerr << p_message << std::endl;
+        std::cerr << CurrentDateTime() << " " << p_message << std::endl;
     }
+}
+
+std::string Config::CurrentDateTime() {
+    auto l_now = std::chrono::system_clock::now();
+    std::time_t l_timeNow = std::chrono::system_clock::to_time_t(l_now);
+
+    std::tm l_tmNow;
+#ifdef _WIN32
+    localtime_s(&l_tmNow, &l_timeNow); // Windows
+#else
+    localtime_r(&l_timeNow, &l_tmNow); // Linux/Unix
+#endif
+
+    std::ostringstream l_oss;
+    l_oss << std::put_time(&l_tmNow, "[%Y-%m-%d %H:%M:%S]");
+    return l_oss.str();
 }
