@@ -216,11 +216,18 @@ void Scanner::WorkerThread(size_t total) {
 
 void Scanner::ScanFileTask(const std::filesystem::path& p_file, size_t p_total) {
     try {
-        std::string l_hash = ComputeSha256(p_file);
-        if (!l_hash.empty() && m_iocHashes.find(l_hash) != m_iocHashes.end()) {
-            std::lock_guard<std::mutex> lock(m_outputMutex);
-            m_config.LogOutput("Correspondence found: " + p_file.string() + " (hash: " + l_hash + ")");
+        std::error_code l_ec;
+        std::string l_hash;
+
+        auto size = std::filesystem::file_size(p_file, l_ec);
+        if (!l_ec && size > 0 && size <= 10 * 1024 * 1024) { // Hash only if file size < 10Mo
+            std::string l_hash = ComputeSha256(p_file);
+            if (!l_hash.empty() && m_iocHashes.find(l_hash) != m_iocHashes.end()) {
+                std::lock_guard<std::mutex> lock(m_outputMutex);
+                m_config.LogOutput("Correspondence found: " + p_file.string() + " (hash: " + l_hash + ")");
+            }
         }
+
         if (CheckExtension(p_file))
         {
             std::lock_guard<std::mutex> lock(m_outputMutex);
