@@ -46,3 +46,4 @@ build/*
 error.log
 output.log
 .vscode
+*.yar
