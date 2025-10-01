@@ -9,8 +9,7 @@ Perfect for detecting suspicious or compromised files on Linux and Windows syste
 - ⚡ Fast scanning with multithreading
 - 📂 Cross-platform: Linux & Windows
 - 🛡 Verify files using SHA-256 (OpenSSL)
-- ⚙️ Flexible configuration:
-    - config.ini file
+- ⚙️ Flexible configuration via config.ini
 - 📝 Log results and errors to files
 - 🚫 Exclude specific directories using PrunePaths
 
@@ -41,19 +40,23 @@ mingw32-make
 Create a `config.ini` file in the project root:
 
 ```
-scan_dir=C:\Path\To\Scan
+scan_dir=*
 output_file=output.log
 error_file=error.log
 ioc_file=C:\Path\To\IOC_hash.csv
 prune_paths=C:\Windows
+debug=0
 ```
 
-- `scan_dir`: Directory to scan  
-- `output_file`: File to log scan results  
-- `error_file`: File to log errors  
-- `ioc_file`: CSV file containing IOC hashes (**ONLY SHA256**)
-- `prune_paths`: Semicolon-separated list of folder names to skip  
-
+### Explanation of parameters
+| Key           | Description                                                                   |
+| ------------- | ----------------------------------------------------------------------------- |
+| `scan_dir`    | Path to the directory to scan. Use `*` to scan all disks. |
+| `output_file` | Path to the file where scan results (matches) are logged.                     |
+| `error_file`  | Path to the file where any errors encountered during the scan are logged.     |
+| `ioc_file`    | Path to a CSV file containing **SHA-256** hashes (one per line).                  |
+| `prune_paths` | List of directory paths to skip, separated by semicolons (`;`).               |
+| `debug`       | Set to `1` to enable verbose debug logs, `0` to disable.                      |
 
 
 ## 📄 IOC File (CSV)
@@ -64,6 +67,25 @@ The IOC file (hashes.csv) should contain one SHA-256 hash per line:
 ```
 - Each hash must be 64 hexadecimal characters
 - Case-insensitive
+- No header required
+
+## ▶️ Run
+Once compiled, you can run the scanner using one of two methods:
+
+### 1.Default Mode (config.ini in same folder as executable)
+If a config.ini file is located in the same directory as the compiled executable, simply run:
+```bash
+./HashScanner
+```
+The application will automatically read the configuration from the local config.ini.
+
+### 2.Manual Mode (custom config path)
+If you want to specify a custom path to the configuration file:
+```bash
+./HashScanner /path/to/your/config.ini
+```
+Make sure the file is readable and correctly formatted. 
+If the config file is invalid or missing required fields, the application will exit with an error message.
 
 ## 🛠 Planned Improvements
 
