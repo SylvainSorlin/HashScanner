@@ -18,6 +18,10 @@
 #include <stdexcept>
 #include <set>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 class Scanner {
 public:
     Scanner(const Config& p_Config);
